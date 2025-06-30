@@ -1,0 +1,105 @@
+name: 构建Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: 设置Java环境
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - name: 安装系统依赖
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y           build-essential           git           ffmpeg           libsdl2-dev           libsdl2-image-dev           libsdl2-mixer-dev           libsdl2-ttf-dev           libportmidi-dev           libswscale-dev           libavformat-dev           libavcodec-dev           zlib1g-dev           libgstreamer1.0-dev           libgstreamer-plugins-base1.0-dev
+    
+    - name: 缓存pip依赖
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+    
+    - name: 安装Python依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install buildozer cython
+        pip install -r requirements.txt
+    
+    - name: 缓存Buildozer全局目录
+      uses: actions/cache@v3
+      with:
+        path: .buildozer_global
+        key: buildozer-global-${{ hashFiles('buildozer_fixed.spec') }}
+    
+    - name: 缓存Buildozer本地目录
+      uses: actions/cache@v3
+      with:
+        path: .buildozer
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer_fixed.spec') }}
+    
+    - name: 创建应用图标
+      run: |
+        mkdir -p data
+        python3 create_icon.py
+    
+    - name: 构建APK
+      run: |
+        export BUILDOZER_SPEC_FILE=buildozer_fixed.spec
+        buildozer android debug
+    
+    - name: 上传APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: 数学建模学习应用-APK
+        path: bin/*.apk
+    
+    - name: 创建Release
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0-${{ github.run_number }}
+        name: 数学建模学习应用 v1.0-${{ github.run_number }}
+        body: |
+          ## 📱 数学建模学习应用 Android版
+          
+          ### ✨ 功能特性
+          - 📚 学习进度管理
+          - 📝 任务跟踪系统
+          - 📊 统计分析功能
+          - 📖 历史记录查看
+          - 🎨 完整中文支持
+          
+          ### 📥 安装说明
+          1. 下载APK文件
+          2. 在Android设备上允许"未知来源"安装
+          3. 点击APK文件进行安装
+          
+          ### 🔧 系统要求
+          - Android 5.0+ (API 21)
+          - 50MB可用存储空间
+          
+          构建时间: ${{ github.event.head_commit.timestamp }}
+          提交哈希: ${{ github.sha }}
+        files: bin/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

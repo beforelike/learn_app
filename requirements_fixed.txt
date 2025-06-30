@@ -1,0 +1,27 @@
+# 核心框架
+kivy==2.1.0
+kivymd==1.1.1
+
+# 网络请求
+requests==2.31.0
+certifi==2023.7.22
+charset-normalizer==3.2.0
+idna==3.4
+urllib3==2.0.4
+
+# 数据处理
+numpy==1.24.3
+pandas==2.0.3
+
+# 图表绘制
+matplotlib==3.7.2
+
+# 图像处理（可选）
+Pillow==10.0.0
+
+# 系统工具
+psutil==5.9.5
+
+# 构建工具（仅开发环境）
+# buildozer==1.5.0
+# cython==3.0.0

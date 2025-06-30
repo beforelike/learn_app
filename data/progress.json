@@ -1,0 +1,10 @@
+{
+  "current_day": 1,
+  "completed_tasks": [],
+  "task_notes": {},
+  "statistics": {
+    "total_study_time": 0,
+    "completion_rate": 0.0,
+    "current_streak": 0
+  }
+}
