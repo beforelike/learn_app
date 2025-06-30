@@ -68,8 +68,10 @@ jobs:
     - name: 上传APK
       uses: actions/upload-artifact@v4
       with:
-        name: 数学建模学习应用-APK
+        name: 数学建模学习应用-APK-${{ github.run_number }}
         path: bin/*.apk
+        compression-level: 6
+        if-no-files-found: error
     
     - name: 创建Release
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
