@@ -13,8 +13,6 @@ source.exclude_patterns = license,images/*/*.jpg
 
 # 版本信息
 version = 1.0
-version.regex = __version__ = ['"](.*?)['"]
-version.filename = %(source.dir)s/main.py
 
 # 应用要求
 requirements = python3,kivy==2.1.0,kivymd==1.1.1,requests,certifi,charset-normalizer,idna,urllib3
